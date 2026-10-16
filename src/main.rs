@@ -9,6 +9,8 @@ use clap::Parser;
 )]
 struct Cli {
     file: PathBuf,
+    #[arg(long)]
+    analyse: bool,
 }
 
 #[derive(Debug)]
@@ -92,16 +94,20 @@ fn main() {
     let cli = Cli::parse();
     let (headers, rows) = load_csv(&cli.file);
 
-    for (i, name) in headers.iter().enumerate() {
-        println!(
-            "{}: {:?}, {:.1}% missing",
-            name,
-            infer_type(&rows, i),
-            missing_percent(&rows, i)
-        );
-    }
+    if cli.analyse {
+        for (i, name) in headers.iter().enumerate() {
+            println!(
+                "{}: {:?}, {:.1}% missing",
+                name,
+                infer_type(&rows, i),
+                missing_percent(&rows, i)
+            );
+        }
 
-    println!("Rows: {}", rows.len());
-    println!("Columns: {}", headers.len());
-    println!("Column names: {}", headers.join(", "));
+        println!("Rows: {}", rows.len());
+        println!("Columns: {}", headers.len());
+        println!("Column names: {}", headers.join(", "));
+    } else {
+        println!("Use --analyse to run the analysis on the file.");
+    }
 }
